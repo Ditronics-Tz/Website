@@ -30,9 +30,6 @@ export default function ServicesPage() {
                   <ArrowRight size={20} className="ml-2" />
                 </Link>
               </Button>
-              <Button variant="secondary" size="lg" asChild>
-                <Link href="/pricing">View Pricing</Link>
-              </Button>
             </div>
           </div>
         </div>

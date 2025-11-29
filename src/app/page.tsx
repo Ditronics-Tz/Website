@@ -72,7 +72,7 @@ export default function Home() {
               className="border-white text-white hover:bg-white hover:text-[var(--anchor-dark)]"
               asChild
             >
-              <Link href="/pricing">View Pricing</Link>
+              <Link href="/services">Our Services</Link>
             </Button>
           </div>
         </div>
