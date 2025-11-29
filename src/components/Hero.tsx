@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
@@ -34,7 +35,7 @@ export function Hero() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,74,0,0.1)] text-[var(--vermilion)] text-sm font-medium mb-6"
             >
               <span className="w-2 h-2 rounded-full bg-[var(--vermilion)] animate-pulse" />
-              Trusted by 500+ enterprises
+              Trusted by clients
             </motion.div>
 
             {/* Heading */}
@@ -108,43 +109,16 @@ export function Hero() {
               
               {/* Center icon */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-24 h-24 rounded-2xl bg-white shadow-lg flex items-center justify-center">
-                  <span className="text-4xl text-[var(--vermilion)]">◆</span>
+                <div className="w-24 h-24 rounded-2xl bg-white shadow-lg flex items-center justify-center overflow-hidden">
+                  <Image
+                    src="/DITRONICS-COMPANY-LOGO.png"
+                    alt="Ditronics Logo"
+                    width={80}
+                    height={80}
+                    className="rounded-xl"
+                  />
                 </div>
               </div>
-
-              {/* Floating cards */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                className="absolute top-8 right-8 bg-white rounded-lg shadow-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[var(--teal-green)]/20 flex items-center justify-center">
-                    <CheckCircle size={20} className="text-[var(--teal-green)]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--anchor-dark)]">99.9%</p>
-                    <p className="text-xs text-[var(--neutral-text)]">Uptime</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="absolute bottom-12 left-4 bg-white rounded-lg shadow-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[var(--vermilion)]/20 flex items-center justify-center">
-                    <span className="text-[var(--vermilion)] font-bold">500+</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--anchor-dark)]">Clients</p>
-                    <p className="text-xs text-[var(--neutral-text)]">Enterprise</p>
-                  </div>
-                </div>
-              </motion.div>
             </div>
           </motion.div>
         </div>

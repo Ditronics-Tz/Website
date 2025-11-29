@@ -21,6 +21,11 @@ export const metadata: Metadata = {
     "enterprise hardware",
     "tech support",
   ],
+  icons: {
+    icon: "/DITRONICS-COMPANY-LOGO.png",
+    shortcut: "/DITRONICS-COMPANY-LOGO.png",
+    apple: "/DITRONICS-COMPANY-LOGO.png",
+  },
   openGraph: {
     title: "Ditronics — Optimize Your Tech",
     description:
@@ -28,12 +33,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Ditronics",
+    images: ["/DITRONICS-COMPANY-LOGO.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Ditronics — Optimize Your Tech",
     description:
       "Enterprise-grade tech solutions. OS downgrades, custom builds, and hardware support you can trust.",
+    images: ["/DITRONICS-COMPANY-LOGO.png"],
   },
 };
 

@@ -97,55 +97,55 @@ export const sampleServices: Service[] = [
   },
 ];
 
-// Sample Projects Data
+// Sample Projects Data (Studio/Creative)
 export const sampleProjects: Project[] = [
   {
     id: "1",
-    title: "Enterprise Desktop Migration",
-    slug: "enterprise-migration",
-    client: "FinCo",
-    date: "2024",
-    coverImage: "",
-    stack: ["Windows 10", "SCCM", "PowerShell", "Azure AD"],
-    outcome: "Reduced incidents by 42%",
-    excerpt:
-      "Migrated 2000 desktops to a stable custom image, implementing zero-touch deployment and reducing support incidents by 42%.",
-  },
-  {
-    id: "2",
-    title: "Data Center Modernization",
-    slug: "data-center-modernization",
+    title: "Corporate Brand Video",
+    slug: "corporate-brand-video",
     client: "TechStart Inc",
     date: "2024",
     coverImage: "",
-    stack: ["VMware", "Kubernetes", "Terraform", "AWS"],
-    outcome: "60% cost reduction",
+    stack: ["4K Video", "Motion Graphics", "Color Grading", "Sound Design"],
+    outcome: "2M+ views",
     excerpt:
-      "Modernized legacy data center infrastructure with cloud-native solutions, achieving 60% reduction in operational costs.",
+      "A compelling brand story video that showcases the company's mission and values, driving engagement across all social platforms.",
+  },
+  {
+    id: "2",
+    title: "Complete Brand Identity",
+    slug: "brand-identity-design",
+    client: "GreenLeaf Co",
+    date: "2024",
+    coverImage: "",
+    stack: ["Logo Design", "Brand Guidelines", "Print Materials", "Digital Assets"],
+    outcome: "Full rebrand launched",
+    excerpt:
+      "Comprehensive brand identity design including logo, color palette, typography, and complete brand guidelines for consistent messaging.",
   },
   {
     id: "3",
-    title: "Security Compliance Overhaul",
-    slug: "security-compliance",
-    client: "HealthNet",
-    date: "2023",
+    title: "Product Launch Live Stream",
+    slug: "product-launch-stream",
+    client: "InnovateTech",
+    date: "2024",
     coverImage: "",
-    stack: ["ISO 27001", "HIPAA", "SOC 2", "Encryption"],
-    outcome: "100% compliance achieved",
+    stack: ["Multi-camera", "Live Graphics", "Real-time Switching", "YouTube/LinkedIn"],
+    outcome: "50K live viewers",
     excerpt:
-      "Implemented comprehensive security framework to achieve HIPAA and SOC 2 compliance for healthcare provider.",
+      "Professional multi-platform live stream for a major product launch, featuring real-time graphics and seamless broadcast quality.",
   },
   {
     id: "4",
-    title: "Custom Workstation Fleet",
-    slug: "workstation-fleet",
-    client: "CreativeStudio",
+    title: "Animated Explainer Series",
+    slug: "animated-explainer-series",
+    client: "EduPlatform",
     date: "2023",
     coverImage: "",
-    stack: ["AMD Threadripper", "RTX 4090", "Linux", "Custom Cooling"],
-    outcome: "3x render performance",
+    stack: ["2D Animation", "Motion Graphics", "Voice Over", "Script Writing"],
+    outcome: "10 episodes delivered",
     excerpt:
-      "Designed and deployed 50 custom workstations for 3D rendering, achieving 3x performance improvement over previous hardware.",
+      "A series of engaging animated explainer videos that simplify complex concepts for the client's educational platform.",
   },
 ];
 

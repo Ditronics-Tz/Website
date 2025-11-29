@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin, Phone } from "lucide-react";
 
 const footerLinks = {
@@ -30,10 +31,16 @@ export function Footer() {
           <div className="space-y-4">
             <Link
               href="/"
-              className="flex items-center gap-2 text-xl font-bold text-white hover:text-[var(--vermilion)] transition-colors"
+              className="flex items-center gap-2 text-xl font-bold text-white hover:opacity-80 transition-opacity"
             >
-              <span className="text-[var(--vermilion)]">◆</span>
-              Ditronics
+              <Image
+                src="/DITRONICS-COMPANY-LOGO.png"
+                alt="Ditronics Logo"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <span>Ditronics</span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed">
               Optimize your tech with enterprise-grade solutions. Custom builds,

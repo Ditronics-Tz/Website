@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,16 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-bold text-[var(--anchor-dark)] hover:text-[var(--vermilion)] transition-colors"
+          className="flex items-center gap-2 text-xl font-bold text-[var(--anchor-dark)] hover:opacity-80 transition-opacity"
         >
-          <span className="text-[var(--vermilion)]">◆</span>
-          Ditronics
+          <Image
+            src="/DITRONICS-COMPANY-LOGO.png"
+            alt="Ditronics Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <span>Ditronics</span>
         </Link>
 
         {/* Desktop Navigation */}
