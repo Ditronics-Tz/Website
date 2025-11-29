@@ -1,0 +1,134 @@
+import Link from "next/link";
+import { Mail, MapPin, Phone } from "lucide-react";
+
+const footerLinks = {
+  company: [
+    { href: "/services", label: "Services" },
+    { href: "/studio", label: "Studio" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/contact", label: "Contact" },
+  ],
+  services: [
+    { href: "/services#os-downgrade", label: "OS Downgrades" },
+    { href: "/services#custom-builds", label: "Custom Builds" },
+    { href: "/services#enterprise", label: "Enterprise Solutions" },
+    { href: "/services#support", label: "Tech Support" },
+  ],
+  resources: [
+    { href: "/laptops", label: "Laptop Catalog" },
+    { href: "/studio", label: "Case Studies" },
+    { href: "/docs", label: "Documentation" },
+    { href: "/faq", label: "FAQ" },
+  ],
+};
+
+export function Footer() {
+  return (
+    <footer className="bg-[var(--anchor-dark)] text-white">
+      <div className="container py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Brand Column */}
+          <div className="space-y-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-xl font-bold text-white hover:text-[var(--vermilion)] transition-colors"
+            >
+              <span className="text-[var(--vermilion)]">◆</span>
+              Ditronics
+            </Link>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Optimize your tech with enterprise-grade solutions. Custom builds,
+              OS downgrades, and hardware support you can trust.
+            </p>
+            <div className="flex flex-col gap-2 text-sm text-gray-400">
+              <a
+                href="mailto:hello@ditronics.com"
+                className="flex items-center gap-2 hover:text-white transition-colors"
+              >
+                <Mail size={16} />
+                hello@ditronics.com
+              </a>
+              <a
+                href="tel:+1234567890"
+                className="flex items-center gap-2 hover:text-white transition-colors"
+              >
+                <Phone size={16} />
+                +1 (234) 567-890
+              </a>
+              <span className="flex items-center gap-2">
+                <MapPin size={16} />
+                San Francisco, CA
+              </span>
+            </div>
+          </div>
+
+          {/* Company Links */}
+          <div>
+            <h4 className="font-semibold text-white mb-4">Company</h4>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services Links */}
+          <div>
+            <h4 className="font-semibold text-white mb-4">Services</h4>
+            <ul className="space-y-3">
+              {footerLinks.services.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources Links */}
+          <div>
+            <h4 className="font-semibold text-white mb-4">Resources</h4>
+            <ul className="space-y-3">
+              {footerLinks.resources.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Ditronics. All rights reserved.
+          </p>
+          <div className="flex gap-6 text-sm text-gray-500">
+            <Link href="#" className="hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="#" className="hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}

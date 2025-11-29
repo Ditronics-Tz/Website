@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
 :root {
+  /* Zapier-inspired color palette */
+  --vermilion: #FF4A00;
+  --pumpkin: #FD7622;
+  --sunny: #FFC43E;
+  --neutral-text: #5F6C72;
+  --trust-blue: #499DF3;
+  --teal-green: #13D0AB;
+  --off-white: #FFFDF9;
+  --anchor-dark: #201515;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #201515;
+  
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-16: 64px;
+  
+  /* Typography */
+  --base-line: 1.5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-vermilion: var(--vermilion);
+  --color-pumpkin: var(--pumpkin);
+  --color-sunny: var(--sunny);
+  --color-neutral-text: var(--neutral-text);
+  --color-trust-blue: var(--trust-blue);
+  --color-teal-green: var(--teal-green);
+  --color-off-white: var(--off-white);
+  --color-anchor-dark: var(--anchor-dark);
+  --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Box sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--neutral-text);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: var(--base-line);
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--trust-blue);
+  outline-offset: 2px;
+}
+
+/* Container utility */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+/* Card utility */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  padding: var(--space-4);
+}
+
+/* Badge utilities */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.badge-instock {
+  background-color: rgba(19, 208, 171, 0.1);
+  color: #0d9373;
+}
+
+.badge-limited {
+  background-color: rgba(255, 196, 62, 0.1);
+  color: #b38600;
+}
+
+.badge-outofstock {
+  background-color: rgba(95, 108, 114, 0.1);
+  color: #5F6C72;
+}
+
+/* Section backgrounds */
+.section-alt {
+  background-color: var(--off-white);
+}
+
+/* Typography utilities */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--anchor-dark);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
+
+/* Link styles */
+a {
+  color: var(--trust-blue);
+  text-decoration: none;
+  transition: color 200ms cubic-bezier(.2,.9,.2,1);
+}
+
+a:hover {
+  color: var(--vermilion);
 }
