@@ -64,6 +64,17 @@ db.exec(`
     value TEXT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS contact_inquiries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    company TEXT,
+    message TEXT NOT NULL,
+    status TEXT DEFAULT 'new',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    read_at DATETIME
+  );
 `);
 
 // Add missing columns if they don't exist (for existing databases)
@@ -265,4 +276,49 @@ export function updateSettings(settings: Record<string, string>): void {
   for (const [key, value] of Object.entries(settings)) {
     updateSetting(key, value);
   }
+}
+
+// Contact Inquiry operations
+export interface ContactInquiry {
+  id: number;
+  name: string;
+  email: string;
+  company: string | null;
+  message: string;
+  status: 'new' | 'read' | 'replied';
+  created_at: string;
+  read_at: string | null;
+}
+
+export function createContactInquiry(inquiry: { name: string; email: string; company?: string; message: string }): number {
+  const result = db.prepare(`
+    INSERT INTO contact_inquiries (name, email, company, message)
+    VALUES (?, ?, ?, ?)
+  `).run(inquiry.name, inquiry.email, inquiry.company || null, inquiry.message);
+  return result.lastInsertRowid as number;
+}
+
+export function getAllContactInquiries(): ContactInquiry[] {
+  return db.prepare('SELECT * FROM contact_inquiries ORDER BY created_at DESC').all() as ContactInquiry[];
+}
+
+export function getContactInquiryById(id: number): ContactInquiry | undefined {
+  return db.prepare('SELECT * FROM contact_inquiries WHERE id = ?').get(id) as ContactInquiry | undefined;
+}
+
+export function getUnreadInquiriesCount(): number {
+  const result = db.prepare('SELECT COUNT(*) as count FROM contact_inquiries WHERE status = ?').get('new') as { count: number };
+  return result.count;
+}
+
+export function markInquiryAsRead(id: number): void {
+  db.prepare('UPDATE contact_inquiries SET status = ?, read_at = CURRENT_TIMESTAMP WHERE id = ?').run('read', id);
+}
+
+export function markInquiryAsReplied(id: number): void {
+  db.prepare('UPDATE contact_inquiries SET status = ? WHERE id = ?').run('replied', id);
+}
+
+export function deleteContactInquiry(id: number): void {
+  db.prepare('DELETE FROM contact_inquiries WHERE id = ?').run(id);
 }

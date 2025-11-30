@@ -1,6 +1,7 @@
 import { ContactForm } from "./ContactForm";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import type { Metadata } from "next";
+import { getAllSettings } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Contact — Ditronics",
@@ -8,7 +9,22 @@ export const metadata: Metadata = {
     "Get in touch with our team. We're here to help with your IT needs.",
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function ContactPage() {
+  const settings = getAllSettings();
+  const email = settings.email || 'info@ditronics.co.tz';
+  const phoneNumber = settings.phone_number || '255717321753';
+  const address = settings.address || 'Shangwe Kibada, Tanzania';
+  
+  // Format phone for display
+  const formatPhoneDisplay = (phone: string) => {
+    if (phone.startsWith('255')) {
+      return `+${phone.slice(0, 3)} ${phone.slice(3, 6)} ${phone.slice(6)}`;
+    }
+    return `+${phone}`;
+  };
+
   return (
     <>
       {/* Hero Section */}
@@ -49,10 +65,10 @@ export default function ContactPage() {
                       Email
                     </h3>
                     <a
-                      href="mailto:info@ditronics.co.tz"
+                      href={`mailto:${email}`}
                       className="text-[var(--anchor-dark)] hover:underline"
                     >
-                      info@ditronics.co.tz
+                      {email}
                     </a>
                   </div>
                 </div>
@@ -66,10 +82,10 @@ export default function ContactPage() {
                       Phone
                     </h3>
                     <a
-                      href="tel:+255717321753"
+                      href={`tel:+${phoneNumber}`}
                       className="text-[var(--anchor-dark)] hover:underline"
                     >
-                      +255 717 321 753
+                      {formatPhoneDisplay(phoneNumber)}
                     </a>
                   </div>
                 </div>
@@ -83,9 +99,7 @@ export default function ContactPage() {
                       Office
                     </h3>
                     <p className="text-[var(--neutral-text)]">
-                      Shangwe Kibada
-                      <br />
-                      Dar es Salaam, Tanzania
+                      {address}
                     </p>
                   </div>
                 </div>

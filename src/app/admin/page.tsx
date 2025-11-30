@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { AdminDashboard } from './AdminDashboard';
-import { getAllLaptops, getAllSettings } from '@/lib/db';
+import { getAllLaptops, getAllSettings, getAllContactInquiries } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +15,7 @@ export default async function AdminPage() {
   
   const laptops = getAllLaptops();
   const settings = getAllSettings();
+  const inquiries = getAllContactInquiries();
   
-  return <AdminDashboard initialLaptops={laptops} initialSettings={settings} />;
+  return <AdminDashboard initialLaptops={laptops} initialSettings={settings} initialInquiries={inquiries} />;
 }

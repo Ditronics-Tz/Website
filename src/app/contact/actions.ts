@@ -1,5 +1,7 @@
 "use server";
 
+import { createContactInquiry } from "@/lib/db";
+
 export interface ContactFormState {
   success: boolean;
   message: string;
@@ -19,7 +21,6 @@ export async function submitContactForm(
   const name = formData.get("name")?.toString().trim() ?? "";
   const email = formData.get("email")?.toString().trim() ?? "";
   const company = formData.get("company")?.toString().trim() ?? "";
-  const plan = formData.get("plan")?.toString().trim() ?? "";
   const message = formData.get("message")?.toString().trim() ?? "";
 
   // Validate
@@ -45,28 +46,14 @@ export async function submitContactForm(
     };
   }
 
-  // In a real application, you would send an email here
-  // using nodemailer, resend, or another email service
   try {
-    // Simulate sending email
-    console.log("Contact form submission:", {
+    // Save to database
+    createContactInquiry({
       name,
       email,
-      company,
-      plan,
+      company: company || undefined,
       message,
     });
-
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // For demo purposes, we'll just log and return success
-    // In production, implement actual email sending:
-    // await sendEmail({
-    //   to: process.env.CONTACT_EMAIL,
-    //   subject: `New contact from ${name}`,
-    //   text: `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nPlan: ${plan}\n\nMessage:\n${message}`,
-    // });
 
     return {
       success: true,

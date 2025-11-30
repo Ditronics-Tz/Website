@@ -20,13 +20,18 @@ import {
   MessageCircle,
   Mail,
   MapPin,
-  Building
+  Building,
+  Inbox,
+  Eye,
+  CheckCircle,
+  Clock
 } from 'lucide-react';
-import type { Laptop as LaptopType } from '@/lib/db';
+import type { Laptop as LaptopType, ContactInquiry } from '@/lib/db';
 
 interface AdminDashboardProps {
   initialLaptops: LaptopType[];
   initialSettings: Record<string, string>;
+  initialInquiries: ContactInquiry[];
 }
 
 // Spec options for dropdowns
@@ -94,7 +99,7 @@ const batteryOptions = [
   '86Wh', '90Wh', '96Wh', '99.9Wh', '100Wh'
 ];
 
-export function AdminDashboard({ initialLaptops, initialSettings }: AdminDashboardProps) {
+export function AdminDashboard({ initialLaptops, initialSettings, initialInquiries }: AdminDashboardProps) {
   const router = useRouter();
   const [laptops, setLaptops] = useState(initialLaptops);
   const [showForm, setShowForm] = useState(false);
@@ -103,10 +108,14 @@ export function AdminDashboard({ initialLaptops, initialSettings }: AdminDashboa
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   // Settings state
-  const [activeTab, setActiveTab] = useState<'laptops' | 'settings'>('laptops');
+  const [activeTab, setActiveTab] = useState<'laptops' | 'settings' | 'inquiries'>('laptops');
   const [settings, setSettings] = useState(initialSettings);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
+  
+  // Inquiries state
+  const [inquiries, setInquiries] = useState(initialInquiries);
+  const [selectedInquiry, setSelectedInquiry] = useState<ContactInquiry | null>(null);
   
   // Form state for combined fields
   const [ramSize, setRamSize] = useState('16GB');
@@ -332,6 +341,27 @@ export function AdminDashboard({ initialLaptops, initialSettings }: AdminDashboa
             )}
           </button>
           <button
+            onClick={() => setActiveTab('inquiries')}
+            className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
+              activeTab === 'inquiries'
+                ? 'text-[var(--vermilion)]'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Inbox size={18} />
+              Inquiries
+              {inquiries.filter(i => i.status === 'new').length > 0 && (
+                <span className="bg-[var(--vermilion)] text-white text-xs rounded-full px-2 py-0.5">
+                  {inquiries.filter(i => i.status === 'new').length}
+                </span>
+              )}
+            </div>
+            {activeTab === 'inquiries' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--vermilion)]" />
+            )}
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
               activeTab === 'settings'
@@ -433,6 +463,176 @@ export function AdminDashboard({ initialLaptops, initialSettings }: AdminDashboa
                   {settingsSaved && (
                     <span className="ml-4 text-sm text-green-600">✓ Settings saved successfully!</span>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Inquiries Tab */}
+        {activeTab === 'inquiries' && (
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-[var(--anchor-dark)]">Contact Inquiries</h2>
+              <p className="text-sm text-gray-500">Messages from visitors through the contact form</p>
+            </div>
+            
+            {inquiries.length === 0 ? (
+              <div className="p-12 text-center">
+                <Inbox size={48} className="mx-auto text-gray-300 mb-4" />
+                <p className="text-gray-500">No inquiries yet</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {inquiries.map((inquiry) => (
+                  <div 
+                    key={inquiry.id}
+                    className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                      inquiry.status === 'new' ? 'bg-blue-50/50' : ''
+                    }`}
+                    onClick={async () => {
+                      setSelectedInquiry(inquiry);
+                      if (inquiry.status === 'new') {
+                        await fetch('/api/inquiries', {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ id: inquiry.id, action: 'read' }),
+                        });
+                        setInquiries(inquiries.map(i => 
+                          i.id === inquiry.id ? { ...i, status: 'read' as const } : i
+                        ));
+                      }
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-[var(--anchor-dark)]">{inquiry.name}</span>
+                          {inquiry.status === 'new' && (
+                            <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">New</span>
+                          )}
+                          {inquiry.status === 'replied' && (
+                            <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <CheckCircle size={12} /> Replied
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500">{inquiry.email}</p>
+                        {inquiry.company && (
+                          <p className="text-sm text-gray-400">{inquiry.company}</p>
+                        )}
+                        <p className="text-sm text-gray-600 mt-2 line-clamp-2">{inquiry.message}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-xs text-gray-400 flex items-center gap-1">
+                          <Clock size={12} />
+                          {new Date(inquiry.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Inquiry Detail Modal */}
+        {selectedInquiry && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-xl">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Inquiry Details</h3>
+                <button onClick={() => setSelectedInquiry(null)}>
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500 mb-1">Name</label>
+                    <p className="text-[var(--anchor-dark)]">{selectedInquiry.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500 mb-1">Email</label>
+                    <a href={`mailto:${selectedInquiry.email}`} className="text-[var(--vermilion)] hover:underline">
+                      {selectedInquiry.email}
+                    </a>
+                  </div>
+                  {selectedInquiry.company && (
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-500 mb-1">Company</label>
+                      <p className="text-[var(--anchor-dark)]">{selectedInquiry.company}</p>
+                    </div>
+                  )}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-500 mb-1">Message</label>
+                    <p className="text-[var(--anchor-dark)] whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                      {selectedInquiry.message}
+                    </p>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-500 mb-1">Received</label>
+                    <p className="text-gray-600">
+                      {new Date(selectedInquiry.created_at).toLocaleString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                  <Button variant="primary" asChild className="flex-1">
+                    <a href={`mailto:${selectedInquiry.email}?subject=Re: Your inquiry to Ditronics`}>
+                      <Mail size={18} className="mr-2" />
+                      Reply via Email
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={async () => {
+                      await fetch('/api/inquiries', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: selectedInquiry.id, action: 'replied' }),
+                      });
+                      setInquiries(inquiries.map(i => 
+                        i.id === selectedInquiry.id ? { ...i, status: 'replied' as const } : i
+                      ));
+                      setSelectedInquiry({ ...selectedInquiry, status: 'replied' });
+                    }}
+                  >
+                    <CheckCircle size={18} className="mr-2" />
+                    Mark as Replied
+                  </Button>
+                  <Button 
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    onClick={async () => {
+                      if (confirm('Are you sure you want to delete this inquiry?')) {
+                        await fetch('/api/inquiries', {
+                          method: 'DELETE',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ id: selectedInquiry.id }),
+                        });
+                        setInquiries(inquiries.filter(i => i.id !== selectedInquiry.id));
+                        setSelectedInquiry(null);
+                      }
+                    }}
+                  >
+                    <Trash2 size={18} />
+                  </Button>
                 </div>
               </div>
             </div>
