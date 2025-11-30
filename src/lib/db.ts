@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import bcrypt from 'bcryptjs';
 
 // Database file stored in project root
 const dbPath = path.join(process.cwd(), 'data', 'ditronics.db');
@@ -33,7 +34,21 @@ db.exec(`
     notes TEXT,
     featured INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Extended specs
+    brand TEXT,
+    model_number TEXT,
+    os TEXT,
+    webcam TEXT,
+    ports TEXT,
+    wifi TEXT,
+    bluetooth TEXT,
+    weight TEXT,
+    dimensions TEXT,
+    color TEXT,
+    keyboard TEXT,
+    warranty TEXT,
+    description TEXT
   );
 
   CREATE TABLE IF NOT EXISTS admin_users (
@@ -44,11 +59,37 @@ db.exec(`
   );
 `);
 
+// Add missing columns if they don't exist (for existing databases)
+const columns = db.prepare("PRAGMA table_info(laptops)").all() as { name: string }[];
+const columnNames = columns.map(c => c.name);
+const newColumns = [
+  { name: 'brand', type: 'TEXT' },
+  { name: 'model_number', type: 'TEXT' },
+  { name: 'os', type: 'TEXT' },
+  { name: 'webcam', type: 'TEXT' },
+  { name: 'ports', type: 'TEXT' },
+  { name: 'wifi', type: 'TEXT' },
+  { name: 'bluetooth', type: 'TEXT' },
+  { name: 'weight', type: 'TEXT' },
+  { name: 'dimensions', type: 'TEXT' },
+  { name: 'color', type: 'TEXT' },
+  { name: 'keyboard', type: 'TEXT' },
+  { name: 'warranty', type: 'TEXT' },
+  { name: 'description', type: 'TEXT' },
+];
+
+for (const col of newColumns) {
+  if (!columnNames.includes(col.name)) {
+    db.exec(`ALTER TABLE laptops ADD COLUMN ${col.name} ${col.type}`);
+  }
+}
+
 // Check if admin exists, if not create default admin
 const adminExists = db.prepare('SELECT COUNT(*) as count FROM admin_users').get() as { count: number };
 if (adminExists.count === 0) {
-  // Default admin: username: admin, password: ditronics2024
-  db.prepare('INSERT INTO admin_users (username, password) VALUES (?, ?)').run('admin', 'ditronics2024');
+  // Default admin: username: admin, password: Ditronics@2036 (stored as hash)
+  const hashedPassword = bcrypt.hashSync('Ditronics@2036', 10);
+  db.prepare('INSERT INTO admin_users (username, password) VALUES (?, ?)').run('admin', hashedPassword);
 }
 
 export default db;
@@ -73,6 +114,20 @@ export interface Laptop {
   featured: number;
   created_at: string;
   updated_at: string;
+  // Extended specs
+  brand: string;
+  model_number: string;
+  os: string;
+  webcam: string;
+  ports: string;
+  wifi: string;
+  bluetooth: string;
+  weight: string;
+  dimensions: string;
+  color: string;
+  keyboard: string;
+  warranty: string;
+  description: string;
 }
 
 // Laptop CRUD operations
@@ -94,8 +149,8 @@ export function getFeaturedLaptops(): Laptop[] {
 
 export function createLaptop(laptop: Omit<Laptop, 'id' | 'created_at' | 'updated_at'>): number {
   const result = db.prepare(`
-    INSERT INTO laptops (name, slug, price, currency, cpu, ram, storage, gpu, display, battery, image, stock_status, condition, notes, featured)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO laptops (name, slug, price, currency, cpu, ram, storage, gpu, display, battery, image, stock_status, condition, notes, featured, brand, model_number, os, webcam, ports, wifi, bluetooth, weight, dimensions, color, keyboard, warranty, description)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     laptop.name,
     laptop.slug,
@@ -111,7 +166,20 @@ export function createLaptop(laptop: Omit<Laptop, 'id' | 'created_at' | 'updated
     laptop.stock_status,
     laptop.condition,
     laptop.notes,
-    laptop.featured
+    laptop.featured,
+    laptop.brand || null,
+    laptop.model_number || null,
+    laptop.os || null,
+    laptop.webcam || null,
+    laptop.ports || null,
+    laptop.wifi || null,
+    laptop.bluetooth || null,
+    laptop.weight || null,
+    laptop.dimensions || null,
+    laptop.color || null,
+    laptop.keyboard || null,
+    laptop.warranty || null,
+    laptop.description || null
   );
   return result.lastInsertRowid as number;
 }
@@ -130,10 +198,12 @@ export function deleteLaptop(id: number): void {
 
 // Admin operations
 export function verifyAdmin(username: string, password: string): boolean {
-  const admin = db.prepare('SELECT * FROM admin_users WHERE username = ? AND password = ?').get(username, password);
-  return !!admin;
+  const admin = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as { password: string } | undefined;
+  if (!admin) return false;
+  return bcrypt.compareSync(password, admin.password);
 }
 
 export function changeAdminPassword(username: string, newPassword: string): void {
-  db.prepare('UPDATE admin_users SET password = ? WHERE username = ?').run(newPassword, username);
+  const hashedPassword = bcrypt.hashSync(newPassword, 10);
+  db.prepare('UPDATE admin_users SET password = ? WHERE username = ?').run(hashedPassword, username);
 }

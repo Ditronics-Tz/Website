@@ -33,6 +33,21 @@ export async function POST(request: Request) {
     const notes = formData.get('notes') as string || '';
     const featured = formData.get('featured') === 'true' ? 1 : 0;
     
+    // Extended fields
+    const brand = formData.get('brand') as string || '';
+    const model_number = formData.get('model_number') as string || '';
+    const os = formData.get('os') as string || '';
+    const webcam = formData.get('webcam') as string || '';
+    const ports = formData.get('ports') as string || '';
+    const wifi = formData.get('wifi') as string || '';
+    const bluetooth = formData.get('bluetooth') as string || '';
+    const weight = formData.get('weight') as string || '';
+    const dimensions = formData.get('dimensions') as string || '';
+    const color = formData.get('color') as string || '';
+    const keyboard = formData.get('keyboard') as string || '';
+    const warranty = formData.get('warranty') as string || '';
+    const description = formData.get('description') as string || '';
+    
     // Handle image upload
     let imagePath = '';
     const imageFile = formData.get('image') as File;
@@ -67,6 +82,19 @@ export async function POST(request: Request) {
       condition,
       notes,
       featured,
+      brand,
+      model_number,
+      os,
+      webcam,
+      ports,
+      wifi,
+      bluetooth,
+      weight,
+      dimensions,
+      color,
+      keyboard,
+      warranty,
+      description,
     });
     
     return NextResponse.json({ success: true, id });
@@ -94,7 +122,13 @@ export async function PUT(request: Request) {
     
     const updates: any = {};
     
-    const fields = ['name', 'price', 'currency', 'cpu', 'ram', 'storage', 'gpu', 'display', 'battery', 'stock_status', 'condition', 'notes'];
+    const fields = [
+      'name', 'price', 'currency', 'cpu', 'ram', 'storage', 'gpu', 'display', 
+      'battery', 'stock_status', 'condition', 'notes',
+      // Extended fields
+      'brand', 'model_number', 'os', 'webcam', 'ports', 'wifi', 'bluetooth',
+      'weight', 'dimensions', 'color', 'keyboard', 'warranty', 'description'
+    ];
     fields.forEach(field => {
       const value = formData.get(field);
       if (value !== null) {
