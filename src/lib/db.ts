@@ -57,6 +57,13 @@ db.exec(`
     password TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT UNIQUE NOT NULL,
+    value TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Add missing columns if they don't exist (for existing databases)
@@ -90,6 +97,22 @@ if (adminExists.count === 0) {
   // Default admin: username: admin, password: Ditronics@2036 (stored as hash)
   const hashedPassword = bcrypt.hashSync('Ditronics@2036', 10);
   db.prepare('INSERT INTO admin_users (username, password) VALUES (?, ?)').run('admin', hashedPassword);
+}
+
+// Initialize default settings
+const defaultSettings = [
+  { key: 'whatsapp_number', value: '255717321753' },
+  { key: 'phone_number', value: '255717321753' },
+  { key: 'email', value: 'info@ditronics.co.tz' },
+  { key: 'address', value: 'Shangwe Kibada, Tanzania' },
+  { key: 'company_name', value: 'Ditronics' },
+];
+
+for (const setting of defaultSettings) {
+  const exists = db.prepare('SELECT COUNT(*) as count FROM settings WHERE key = ?').get(setting.key) as { count: number };
+  if (exists.count === 0) {
+    db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run(setting.key, setting.value);
+  }
 }
 
 export default db;
@@ -206,4 +229,40 @@ export function verifyAdmin(username: string, password: string): boolean {
 export function changeAdminPassword(username: string, newPassword: string): void {
   const hashedPassword = bcrypt.hashSync(newPassword, 10);
   db.prepare('UPDATE admin_users SET password = ? WHERE username = ?').run(hashedPassword, username);
+}
+
+// Settings operations
+export interface Setting {
+  id: number;
+  key: string;
+  value: string;
+  updated_at: string;
+}
+
+export function getAllSettings(): Record<string, string> {
+  const settings = db.prepare('SELECT key, value FROM settings').all() as { key: string; value: string }[];
+  return settings.reduce((acc, s) => {
+    acc[s.key] = s.value;
+    return acc;
+  }, {} as Record<string, string>);
+}
+
+export function getSetting(key: string): string | null {
+  const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
+  return setting?.value || null;
+}
+
+export function updateSetting(key: string, value: string): void {
+  const exists = db.prepare('SELECT COUNT(*) as count FROM settings WHERE key = ?').get(key) as { count: number };
+  if (exists.count === 0) {
+    db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run(key, value);
+  } else {
+    db.prepare('UPDATE settings SET value = ?, updated_at = CURRENT_TIMESTAMP WHERE key = ?').run(value, key);
+  }
+}
+
+export function updateSettings(settings: Record<string, string>): void {
+  for (const [key, value] of Object.entries(settings)) {
+    updateSetting(key, value);
+  }
 }

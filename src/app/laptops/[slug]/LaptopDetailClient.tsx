@@ -33,6 +33,7 @@ import {
 interface LaptopDetailClientProps {
   laptop: Laptop;
   relatedLaptops: Laptop[];
+  settings: Record<string, string>;
 }
 
 const stockStatusVariant: Record<string, "success" | "warning" | "muted"> = {
@@ -41,7 +42,7 @@ const stockStatusVariant: Record<string, "success" | "warning" | "muted"> = {
   "Out of Stock": "muted",
 };
 
-export function LaptopDetailClient({ laptop, relatedLaptops }: LaptopDetailClientProps) {
+export function LaptopDetailClient({ laptop, relatedLaptops, settings }: LaptopDetailClientProps) {
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat("en-TZ", {
       style: "currency",
@@ -50,6 +51,9 @@ export function LaptopDetailClient({ laptop, relatedLaptops }: LaptopDetailClien
     }).format(price);
   };
 
+  const whatsappNumber = settings.whatsapp_number || '255717321753';
+  const phoneNumber = settings.phone_number || '255717321753';
+  
   const whatsappMessage = encodeURIComponent(
     `Hi! I'm interested in the ${laptop.name} listed at ${formatPrice(laptop.price, laptop.currency)}. Is it still available?`
   );
@@ -202,7 +206,7 @@ export function LaptopDetailClient({ laptop, relatedLaptops }: LaptopDetailClien
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button variant="primary" size="lg" className="flex-1" asChild>
                   <a 
-                    href={`https://wa.me/255123456789?text=${whatsappMessage}`}
+                    href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -211,7 +215,7 @@ export function LaptopDetailClient({ laptop, relatedLaptops }: LaptopDetailClien
                   </a>
                 </Button>
                 <Button variant="outline" size="lg" className="flex-1" asChild>
-                  <a href="tel:+255123456789">
+                  <a href={`tel:+${phoneNumber}`}>
                     <Phone size={20} className="mr-2" />
                     Call Us
                   </a>
@@ -456,7 +460,7 @@ export function LaptopDetailClient({ laptop, relatedLaptops }: LaptopDetailClien
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="primary" size="lg" asChild>
                 <a 
-                  href={`https://wa.me/255123456789?text=${whatsappMessage}`}
+                  href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { getAllSettings } from "@/lib/db";
 
 const footerLinks = {
   company: [
@@ -23,6 +24,20 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const settings = getAllSettings();
+  const phoneNumber = settings.phone_number || '255717321753';
+  const email = settings.email || 'info@ditronics.co.tz';
+  const address = settings.address || 'Shangwe Kibada, Tanzania';
+  const companyName = settings.company_name || 'Ditronics';
+  
+  // Format phone for display (add + and spaces)
+  const formatPhoneDisplay = (phone: string) => {
+    if (phone.startsWith('255')) {
+      return `+${phone.slice(0, 3)} ${phone.slice(3, 6)} ${phone.slice(6)}`;
+    }
+    return `+${phone}`;
+  };
+
   return (
     <footer className="bg-[var(--anchor-dark)] text-white">
       <div className="container py-16">
@@ -35,12 +50,12 @@ export function Footer() {
             >
               <Image
                 src="/DITRONICS-COMPANY-LOGO.png"
-                alt="Ditronics Logo"
+                alt={`${companyName} Logo`}
                 width={40}
                 height={40}
                 className="rounded-full"
               />
-              <span>Ditronics</span>
+              <span>{companyName}</span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed">
               Your trusted partner for software integration, IT infrastructure,
@@ -48,22 +63,22 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-2 text-sm text-gray-400">
               <a
-                href="mailto:info@ditronics.co.tz"
+                href={`mailto:${email}`}
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Mail size={16} />
-                info@ditronics.co.tz
+                {email}
               </a>
               <a
-                href="tel:+255717321753"
+                href={`tel:+${phoneNumber}`}
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Phone size={16} />
-                +255 717 321 753
+                {formatPhoneDisplay(phoneNumber)}
               </a>
               <span className="flex items-center gap-2">
                 <MapPin size={16} />
-                Shangwe Kibada, Tanzania
+                {address}
               </span>
             </div>
           </div>

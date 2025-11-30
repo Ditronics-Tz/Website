@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -14,12 +14,19 @@ import {
   Laptop, 
   Save,
   X,
-  Upload
+  Upload,
+  Settings,
+  Phone,
+  MessageCircle,
+  Mail,
+  MapPin,
+  Building
 } from 'lucide-react';
 import type { Laptop as LaptopType } from '@/lib/db';
 
 interface AdminDashboardProps {
   initialLaptops: LaptopType[];
+  initialSettings: Record<string, string>;
 }
 
 // Spec options for dropdowns
@@ -87,13 +94,19 @@ const batteryOptions = [
   '86Wh', '90Wh', '96Wh', '99.9Wh', '100Wh'
 ];
 
-export function AdminDashboard({ initialLaptops }: AdminDashboardProps) {
+export function AdminDashboard({ initialLaptops, initialSettings }: AdminDashboardProps) {
   const router = useRouter();
   const [laptops, setLaptops] = useState(initialLaptops);
   const [showForm, setShowForm] = useState(false);
   const [editingLaptop, setEditingLaptop] = useState<LaptopType | null>(null);
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  // Settings state
+  const [activeTab, setActiveTab] = useState<'laptops' | 'settings'>('laptops');
+  const [settings, setSettings] = useState(initialSettings);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSaved, setSettingsSaved] = useState(false);
   
   // Form state for combined fields
   const [ramSize, setRamSize] = useState('16GB');
@@ -109,6 +122,22 @@ export function AdminDashboard({ initialLaptops }: AdminDashboardProps) {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/admin/login');
     router.refresh();
+  };
+
+  const handleSaveSettings = async () => {
+    setSettingsLoading(true);
+    try {
+      await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 3000);
+    } catch (error) {
+      alert('Failed to save settings');
+    }
+    setSettingsLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -284,6 +313,135 @@ export function AdminDashboard({ initialLaptops }: AdminDashboardProps) {
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('laptops')}
+            className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
+              activeTab === 'laptops'
+                ? 'text-[var(--vermilion)]'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Laptop size={18} />
+              Laptops
+            </div>
+            {activeTab === 'laptops' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--vermilion)]" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
+              activeTab === 'settings'
+                ? 'text-[var(--vermilion)]'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Settings size={18} />
+              Settings
+            </div>
+            {activeTab === 'settings' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--vermilion)]" />
+            )}
+          </button>
+        </div>
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="max-w-2xl">
+              <h2 className="text-xl font-semibold text-[var(--anchor-dark)] mb-6">Contact Settings</h2>
+              <p className="text-sm text-gray-500 mb-6">
+                Configure the contact information that appears across the website, including WhatsApp inquiry buttons and call links.
+              </p>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <MessageCircle size={16} className="text-green-600" />
+                    WhatsApp Number
+                  </label>
+                  <Input
+                    value={settings.whatsapp_number || ''}
+                    onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
+                    placeholder="e.g. 255717321753 (without + sign)"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Enter the number without + or spaces (e.g., 255717321753)</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <Phone size={16} className="text-blue-600" />
+                    Phone Number
+                  </label>
+                  <Input
+                    value={settings.phone_number || ''}
+                    onChange={(e) => setSettings({ ...settings, phone_number: e.target.value })}
+                    placeholder="e.g. 255717321753"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">This number will be used for "Call Us" buttons</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <Mail size={16} className="text-red-500" />
+                    Email Address
+                  </label>
+                  <Input
+                    value={settings.email || ''}
+                    onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                    placeholder="e.g. info@ditronics.co.tz"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <MapPin size={16} className="text-orange-500" />
+                    Address
+                  </label>
+                  <Input
+                    value={settings.address || ''}
+                    onChange={(e) => setSettings({ ...settings, address: e.target.value })}
+                    placeholder="e.g. Shangwe Kibada, Tanzania"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <Building size={16} className="text-purple-500" />
+                    Company Name
+                  </label>
+                  <Input
+                    value={settings.company_name || ''}
+                    onChange={(e) => setSettings({ ...settings, company_name: e.target.value })}
+                    placeholder="e.g. Ditronics"
+                  />
+                </div>
+                
+                <div className="pt-4 border-t border-gray-200">
+                  <Button 
+                    variant="primary" 
+                    onClick={handleSaveSettings}
+                    disabled={settingsLoading}
+                  >
+                    <Save size={18} className="mr-2" />
+                    {settingsLoading ? 'Saving...' : 'Save Settings'}
+                  </Button>
+                  {settingsSaved && (
+                    <span className="ml-4 text-sm text-green-600">✓ Settings saved successfully!</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Laptops Tab */}
+        {activeTab === 'laptops' && (
+          <>
         {/* Add Button */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-[var(--anchor-dark)]">Laptops</h2>
@@ -917,6 +1075,8 @@ export function AdminDashboard({ initialLaptops }: AdminDashboardProps) {
             </div>
           )}
         </div>
+        </>
+        )}
       </main>
     </div>
   );

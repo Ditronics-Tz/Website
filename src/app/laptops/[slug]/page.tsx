@@ -1,4 +1,4 @@
-import { getLaptopBySlug, getAllLaptops } from "@/lib/db";
+import { getLaptopBySlug, getAllLaptops, getAllSettings } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { LaptopDetailClient } from "./LaptopDetailClient";
@@ -43,5 +43,8 @@ export default async function LaptopDetailPage({ params }: Props) {
     )
     .slice(0, 3);
 
-  return <LaptopDetailClient laptop={laptop} relatedLaptops={relatedLaptops} />;
+  // Get settings for contact info
+  const settings = getAllSettings();
+
+  return <LaptopDetailClient laptop={laptop} relatedLaptops={relatedLaptops} settings={settings} />;
 }
