@@ -179,9 +179,15 @@ function handleFileUpload(array $file, string $directory = 'uploads'): ?string
         return null;
     }
 
-    // Generate unique filename
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = time() . '-' . bin2hex(random_bytes(8)) . '.' . strtolower($extension);
+    // Sanitize and validate extension - only allow common image extensions
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($extension, $allowedExtensions)) {
+        return null;
+    }
+    
+    // Generate unique filename (ignores original filename to prevent injection)
+    $filename = time() . '-' . bin2hex(random_bytes(8)) . '.' . $extension;
 
     // Ensure directory exists
     $uploadDir = PUBLIC_PATH . '/' . $directory;

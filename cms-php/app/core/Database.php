@@ -197,12 +197,15 @@ class Database
             );
         ");
 
-        // Create default admin user
-        $hashedPassword = password_hash(DEFAULT_ADMIN_PASSWORD, PASSWORD_DEFAULT);
-        $this->insert('admin_users', [
-            'username' => DEFAULT_ADMIN_USERNAME,
-            'password' => $hashedPassword,
-        ]);
+        // Create default admin user only if none exists
+        $adminExists = $this->fetchColumn('SELECT COUNT(*) FROM admin_users WHERE username = ?', [DEFAULT_ADMIN_USERNAME]);
+        if ($adminExists == 0) {
+            $hashedPassword = password_hash(DEFAULT_ADMIN_PASSWORD, PASSWORD_DEFAULT);
+            $this->insert('admin_users', [
+                'username' => DEFAULT_ADMIN_USERNAME,
+                'password' => $hashedPassword,
+            ]);
+        }
 
         // Create default settings
         $defaultSettings = [

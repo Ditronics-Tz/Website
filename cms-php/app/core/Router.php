@@ -51,8 +51,9 @@ class Router
     private function addRoute(string $method, string $path, string $handler): void
     {
         // Convert route pattern to regex
-        // {param} becomes (?P<param>[^/]+)
-        $pattern = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[^/]+)', $path);
+        // {param} becomes (?P<param>[a-zA-Z0-9_-]+) for safe URL slugs
+        // This restricts parameters to alphanumeric, underscore, and hyphen
+        $pattern = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[a-zA-Z0-9_-]+)', $path);
         $pattern = '#^' . $pattern . '$#';
 
         $this->routes[$method][$pattern] = $handler;

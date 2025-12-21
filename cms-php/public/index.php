@@ -8,9 +8,18 @@
 
 declare(strict_types=1);
 
-// Error reporting for development (disable in production)
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+// Environment detection - only enable error display in development
+$isProduction = getenv('APP_ENV') === 'production' || 
+                (isset($_SERVER['HTTP_HOST']) && !preg_match('/^(localhost|127\.0\.0\.1|.*\.local)/', $_SERVER['HTTP_HOST']));
+
+if ($isProduction) {
+    error_reporting(0);
+    ini_set('display_errors', '0');
+    ini_set('log_errors', '1');
+} else {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+}
 
 // Define base paths
 define('ROOT_PATH', dirname(__DIR__));

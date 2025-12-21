@@ -595,7 +595,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const csrfToken = '<?= $csrfToken ?>';
+    const csrfToken = <?= json_encode($csrfToken, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
     
     // Tab switching
     const tabBtns = document.querySelectorAll('.tab-btn');
